@@ -1,15 +1,21 @@
 package parking
 
-
 fun main() {
     data class Car(val regNumber: String, val color: String)
 
-    val parking = mutableListOf<Car?>(Car("reserved", "reserved"))
+    val parking = mutableListOf<Car?>()
 
     fun park(regNumber: String, color: String): String {
-        parking.add(Car(regNumber, color))
-        val spotNumber = parking.indexOf(Car(regNumber, color)) + 1
-        return "$color car parked in spot ${spotNumber}."
+        val nullSpot = parking.indexOf(null)
+        if (parking.size == 20 && nullSpot == -1) return "Sorry, the parking lot is full."
+        return if (nullSpot != -1) {
+            parking[nullSpot] = Car(regNumber, color)
+            "$color car parked in spot ${nullSpot + 1}."
+        } else {
+            parking.add(Car(regNumber, color))
+            val spotNumber = parking.indices.last + 1
+            "$color car parked in spot ${spotNumber}."
+        }
     }
 
     fun leave(spot: Int): String {
@@ -18,10 +24,12 @@ fun main() {
             "Spot $spot is free."
         } else "There is no car in spot ${spot}."
     }
-
-    val input = readLine()!!.split(' ')
-    when {
-        input[0] == "park" -> println(park(input[1], input[2]))
-        input[0] == "leave" -> println(leave(input[1].toInt()))
+    while (true) {
+        val input = readLine()!!.split(' ')
+        when (input[0]) {
+            "park" -> println(park(input[1], input[2]))
+            "leave" -> println(leave(input[1].toInt()))
+            "exit" -> return
+        }
     }
 }
